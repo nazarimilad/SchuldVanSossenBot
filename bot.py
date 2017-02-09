@@ -3,19 +3,25 @@
 
 import praw, pdb, re, os
 
-reddit = praw.Reddit('SchuldVanSossenBot')
-subreddit = reddit.subreddit("Belgium")
+reddit = praw.Reddit('SchuldVanSossenBot') # Make an instance of the Reddit object
+subreddit = reddit.subreddit("Belgium")    # Make an instance of the subreddit /r/Belgium with the Reddit instance
+nameWhitelistFile = "posts_replied_to.txt"
+message = "Het is de schuld van de sossen!"
+
+# Keywords used to target specific posts, containing one of more of this keywords
+# not only this keywords explicitly, but also very similar words. For example: "ban" --> "banned" is also used to target
 keywords = ("ban",
             "stolen", "steel", "stelen", "vole", "volé",
             "falling apart",
-            "fined", "boet", "beboet",
-            "schuldig", "guilty", "coupable"
-           )
+            "fined", "boet", "beboet",                          
+            "schuldig", "guilty", "coupable",
+            "failli", "bankrupt")
 
-if not os.path.isfile("posts_replied_to.txt"):
+# Posts on which the comment already has been posted, shouldn't be targeted a second time
+if not os.path.isfile(nameWhitelistFile):
     posts_replied_to = []
 else:
-    with open("posts_replied_to.txt", "r") as f:
+    with open(nameWhitelistFile, "r") as f:
         posts_replied_to = f.read()
         posts_replied_to = posts_replied_to.split("\n")
         posts_replied_to = list(filter(None, posts_replied_to))
@@ -28,10 +34,10 @@ for submission in subreddit.hot(limit=5):
                 isKeywordInTitle = True
 
         if isKeywordInTitle:
-            submission.reply("Het is de schuld van de sossen!")
-            print("SchuldVanSossenBot replying to: ", submission.title)
+            submission.reply(message)
             posts_replied_to.append(submission.id)
 
-with open("posts_replied_to.txt", "w") as f:
+# Posts which first didn't have the comment but now do, get whitelisted too
+with open(nameWhitelistFile, "w") as f:
     for post_id in posts_replied_to:
         f.write(post_id + "\n")
