@@ -11,4 +11,3 @@ To run the script only once, run `python bot.py` in the same folder as where the
 
 To automate it (to actually use it as a bot), you can use crontab on Linux.
 
-
